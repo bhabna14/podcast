@@ -4801,7 +4801,7 @@ body::-webkit-scrollbar-thumb {
     right: 0px;
   }
   .store-item {
-    height: 415px;
+    /* height: 415px; */
     
 }
 
