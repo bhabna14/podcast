@@ -415,11 +415,11 @@
                 var pageUrl = window.location.href;
                 var shareUrl;
 
-                if (platform === "whatsapp") {
+                if (platform == "whatsapp") {
                     shareUrl = "https://wa.me/?text=" + encodeURIComponent(pageUrl);
-                } else if (platform === "facebook") {
+                } else if (platform == "facebook") {
                     shareUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(pageUrl);
-                } else if (platform === "twitter") {
+                } else if (platform == "twitter") {
                     shareUrl = "https://twitter.com/intent/tweet?url=" + encodeURIComponent(pageUrl);
                 }
 
@@ -448,11 +448,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 var currentPageUrl = window.location.href;
                 var shareUrl;
 
-                if (platform === "whatsapp") {
+                if (platform == "whatsapp") {
                     shareUrl = "https://wa.me/?text=" + encodeURIComponent(currentPageUrl);
-                } else if (platform === "facebook") {
+                } else if (platform == "facebook") {
                     shareUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(currentPageUrl);
-                } else if (platform === "twitter") {
+                } else if (platform == "twitter") {
                     shareUrl = "https://twitter.com/intent/tweet?url=" + encodeURIComponent(currentPageUrl);
                 }
 
