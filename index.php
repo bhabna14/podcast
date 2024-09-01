@@ -70,6 +70,62 @@
     background-color: rgba(0, 0, 0, 0.5);
     border-radius: 50%;
 }
+::before {
+    font-size: 19px;
+}
+/* Dropdown button */
+.dropdown-button {
+    /* background-color: #C1252F; */
+    color: #000;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 100px;
+    text-align: left;
+    /* box-shadow: 3px 4px 6px rgb(0 0 0 / 20%); */
+}
+
+/* Dropdown container */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+/* Dropdown content (hidden by default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    margin-top: 0px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: black;
+    padding: 6px 5px;
+    text-decoration: none;
+    display: block;
+    font-size: 15px;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+/* Show the dropdown content when the button is clicked */
+.show {
+    display: block;
+}
+
 </style>
 
 </head>
@@ -297,31 +353,34 @@
 
                 echo'
    
-        <div class="col-md-6 col-xl-4">
-                  <a data-link data-title="' . $name . '" data-artist="AudioPizza"
-                       data-img="' . $image_url . '"
-                       href="' . $music_url . '" class="single-item__cover" style="height: 245px !important">
-                       <img src="' . $image_url . '" alt="' . $name . '">
-                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                           <path d="M18.54,9,8.88,3.46a3.42,3.42,0,0,0-5.13,3V17.58A3.42,3.42,0,0,0,7.17,21a3.43,3.43,0,0,0,1.71-.46L18.54,15a3.42,3.42,0,0,0,0-5.92Zm-1,4.19L7.88,18.81a1.44,1.44,0,0,1-1.42,0,1.42,1.42,0,0,1-.71-1.23V6.42a1.42,1.42,0,0,1,.71-1.23A1.51,1.51,0,0,1,7.17,5a1.54,1.54,0,0,1,.71.19l9.66,5.58a1.42,1.42,0,0,1,0,2.46Z"/>
-                       </svg>
-                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                           <path d="M16,2a3,3,0,0,0-3,3V19a3,3,0,0,0,6,0V5A3,3,0,0,0,16,2Zm1,17a1,1,0,0,1-2,0V5a1,1,0,0,1,2,0ZM8,2A3,3,0,0,0,5,5V19a3,3,0,0,0,6,0V5A3,3,0,0,0,8,2ZM9,19a1,1,0,0,1-2,0V5A1,1,0,0,1,9,5Z"/>
-                       </svg>
-                    </a>
-                  <li class="single-item">
-                    
-                    <div class="single-item__title">
-                      <h4 style="font-weight: bold;color: #C1252F;font-size: 18px">' . $name . '</h4>
-                      <p style="font-size: 14px;">' . $description . '</p>
-                    </div>
-                    <div class="share">
-                      <span style="cursor: pointer" class="whatsapp" id="whatsapp-share-' . $index . '"><ion-icon name="logo-whatsapp"></ion-icon></span>
-                      <span style="cursor: pointer" class="facebook" id="facebook-share-' . $index . '"><ion-icon name="logo-facebook"></ion-icon></span>
-                      <span style="cursor: pointer" class="twitter" id="twitter-share-' . $index . '"><i class="fa-brands fa-x-twitter"></i></span>
-                    </div>
-                  </li>
-          </div>
+       <div class="col-md-6 col-xl-4">
+    <a data-link data-title="' . $name . '" data-artist="AudioPizza"
+       data-img="' . $image_url . '"
+       href="' . $music_url . '" class="single-item__cover" style="height: 245px !important">
+       <img src="' . $image_url . '" alt="' . $name . '">
+       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+           <path d="M18.54,9,8.88,3.46a3.42,3.42,0,0,0-5.13,3V17.58A3.42,3.42,0,0,0,7.17,21a3.43,3.43,0,0,0,1.71-.46L18.54,15a3.42,3.42,0,0,0,0-5.92Zm-1,4.19L7.88,18.81a1.44,1.44,0,0,1-1.42,0,1.42,1.42,0,0,1-.71-1.23V6.42a1.42,1.42,0,0,1,.71-1.23A1.51,1.51,0,0,1,7.17,5a1.54,1.54,0,0,1,.71.19l9.66,5.58a1.42,1.42,0,0,1,0,2.46Z"/>
+       </svg>
+       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+           <path d="M16,2a3,3,0,0,0-3,3V19a3,3,0,0,0,6,0V5A3,3,0,0,0,16,2Zm1,17a1,1,0,0,1-2,0V5a1,1,0,0,1,2,0ZM8,2A3,3,0,0,0,5,5V19a3,3,0,0,0,6,0V5A3,3,0,0,0,8,2ZM9,19a1,1,0,0,1-2,0V5A1,1,0,0,1,9,5Z"/>
+       </svg>
+    </a>
+    <li class="single-item">
+        <div class="single-item__title">
+            <h4 style="font-weight: bold;color: #C1252F;font-size: 18px">' . $name . '</h4>
+            <p style="font-size: 14px;">' . $description . '</p>
+        </div>
+        <div class="dropdown">
+            <button class="dropdown-button" onclick="toggleDropdown(' . $index . ')">  <i class="fa fa-share-alt"></i></button>
+            <div class="dropdown-content" id="dropdown-' . $index . '">
+                <a href="#" class="whatsapp" id="whatsapp-share"><ion-icon name="logo-whatsapp"></ion-icon> WhatsApp</a>
+                <a href="#" class="facebook"  id="facebook-share"><ion-icon name="logo-facebook"></ion-icon> Facebook</a>
+                <a href="#" class="twitter" id="twitter-share"><i class="fa-brands fa-x-twitter"></i> Twitter</a>
+            </div>
+        </div>
+    </li>
+</div>
+
      ';
             }
         } else {
@@ -402,6 +461,12 @@
 	<!-- JS -->
 
     <script>
+
+function toggleDropdown(index) {
+    var dropdown = document.getElementById('dropdown-' + index);
+    dropdown.classList.toggle("show");
+}
+
  document.addEventListener("DOMContentLoaded", function () {
     // Get all share icons
     var whatsappShare = document.querySelectorAll("#whatsapp-share");

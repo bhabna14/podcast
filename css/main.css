@@ -2933,12 +2933,12 @@ body::-webkit-scrollbar-thumb {
 .single-item {
   position: relative;
   width: 90%;
-  height: 192px;
+  height: 180px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 38px;
   margin-top: -63px;
   /* z-index: 1; */
   padding: 18px 15px 10px 15px;
@@ -2990,19 +2990,17 @@ body::-webkit-scrollbar-thumb {
   height: 247px;
   border-radius: 22px;
 }
-
 .single-item__title {
-  height: 200px;
+  height: 178px;
   display: inline-flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  text-align: center; 
-  margin-left: 0; /* Remove left margin */
-  margin-right: 0; /* Remove right margin */
-  margin-bottom: 10px; /* Margin for spacing */
+  text-align: center;
+  margin-left: 0;
+  margin-right: 0;
+  /* margin-bottom: 10px; */
 }
-
 .single-item__title h4 {
   display: block;
   width: 100%;
