@@ -177,7 +177,7 @@
   Player
 </button>
 	<!-- end player -->
-  <section class="row row--grid">
+  <section class="row row--grid podcast-div-div">
   <div class="col-12 d-flex justify-content-center align-items-center" style="background-color: #C1252F; padding: 60px 0px;">
   <div class="col-10">
         <?php
