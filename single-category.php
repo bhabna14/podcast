@@ -1,3 +1,30 @@
+<?php
+// Get the category ID from the query parameter
+$category_id = isset($_GET['category_id']) ? intval($_GET['category_id']) : 0;
+
+// Fetch podcasts from the API
+$curl = curl_init();
+curl_setopt_array($curl, array(
+    CURLOPT_URL => 'http://pandit.33crores.com/api/podcasts',
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => '',
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 0,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => 'GET',
+));
+
+$response = curl_exec($curl);
+curl_close($curl);
+
+$podcasts = json_decode($response, true);
+
+// Filter podcasts by category ID
+$filtered_podcasts = array_filter($podcasts['data'], function($podcast) use ($category_id) {
+    return isset($podcast['podcast_category_id']) && $podcast['podcast_category_id'] == $category_id;
+});
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -179,6 +206,50 @@
   font-size: 14px;
   color: #333; /* You can adjust the text color as needed */
 }
+.category-banner {
+    position: relative;
+    width: 100%;
+    height: 350px; 
+    background-size: center;
+    background-position: center top;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 10px; /* Rounded corners for a unique look */
+    margin-bottom:30px;
+}
+
+.category-banner .overlay {
+    background: rgba(0, 0, 0, 0.5); /* Dark overlay for text readability */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.category-title {
+    color: #fff;
+    font-size: 48px; /* Adjust size */
+    font-weight: bold;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7); /* Subtle shadow for depth */
+    animation: fadeIn 2s ease-in-out; /* Text fade-in effect */
+}
+
+/* Add a subtle animation */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 
 </style>
 
@@ -231,273 +302,115 @@
   Player
 </button>
 	<!-- end player -->
-<main class="" style="margin-bottom:50px">
-  <div class="">
-    <!-- Home Banner Section -->
-    <div class="home-banner-section">
-      <div id="homeBannerCarousel" class="owl-carousel owl-theme">
-        <!-- Banner Image Item -->
-        <div class="item">
-          <img src="https://poojastore.33crores.com/cdn/shop/files/3_6426324a-0668-4d7a-b907-cc51d2f0d0b1.png" alt="Home Banner" class="img-fluid d-block w-100">
-        </div>
-        <div class="item">
-          <img src="https://poojastore.33crores.com/cdn/shop/files/3_6426324a-0668-4d7a-b907-cc51d2f0d0b1.png" alt="Home Banner" class="img-fluid d-block w-100">
-        </div>
-        <div class="item">
-          <img src="https://poojastore.33crores.com/cdn/shop/files/3_6426324a-0668-4d7a-b907-cc51d2f0d0b1.png" alt="Home Banner" class="img-fluid d-block w-100">
-        </div>
-        <!-- You can add more images here by copying the above block -->
-      </div>
-    </div>
-  </div>
-</main>
+<!-- main content for single category -->
+<?php
+// Get the category_id from the URL
+$categoryId = isset($_GET['category_id']) ? intval($_GET['category_id']) : null;
 
-<section class="row row--grid podcast-div-div">
-  <div class="col-12 d-flex justify-content-center align-items-center" >
-  <div class="col-10">
-        <?php
-        // Initialize cURL session
-        $curl = curl_init();
+// Check if category_id is provided
+if ($categoryId === null) {
+    echo "Category ID is not specified.";
+    exit;
+}
 
-        // Set cURL options
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => 'http://pandit.33crores.com/api/podcasts',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
+// Fetch data from the API
+$apiUrl = 'https://pandit.33crores.com/api/podcastcategory';
+$categoryData = file_get_contents($apiUrl);
 
-        // Execute cURL request and get response
-        $response = curl_exec($curl);
+// Check if the API response is valid
+if ($categoryData === false) {
+    echo "Failed to fetch category data.";
+    exit;
+}
 
-        // Check for cURL errors
-        if (curl_errno($curl)) {
-            echo 'cURL error: ' . curl_error($curl);
-            curl_close($curl);
-            exit;
-        }
+$categories = json_decode($categoryData, true); // Decode JSON to associative array
 
-        // Close cURL session
-        curl_close($curl);
+// Check if decoding was successful and 'data' field exists
+if ($categories === null || !isset($categories['data'])) {
+    echo "Invalid category data format.";
+    exit;
+}
 
-        // Decode JSON response
-        $podcasts = json_decode($response, true);
-
-        // Check if decoding was successful and the response is an array
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            echo 'JSON decode error: ' . json_last_error_msg();
-        } elseif (!is_array($podcasts) || !isset($podcasts['data'])) {
-            echo '<p>API response is not in the expected format.</p>';
-        } else {
-            // Sort podcasts by 'created_at' in descending order
-            usort($podcasts['data'], function ($a, $b) {
-                return strtotime($b['created_at']) - strtotime($a['created_at']);
-            });
-
-            // Get only the latest podcast
-            $latestPodcast = $podcasts['data'][0]; // Assuming there's at least one podcast
-
-            // Ensure that each field is set and is a string
-            $name = isset($latestPodcast['name']) ? htmlspecialchars($latestPodcast['name']) : 'Unknown Name';
-            $description = isset($latestPodcast['description']) ? htmlspecialchars($latestPodcast['description']) : 'No Description';
-            $image_url = isset($latestPodcast['image_url']) ? htmlspecialchars($latestPodcast['image_url']) : 'default-image.png';
-            $music_url = isset($latestPodcast['music_url']) ? htmlspecialchars($latestPodcast['music_url']) : '#';
-
-            // Display only the latest podcast
-            echo '
-          <section>
-            <div class="container store-item" style="box-shadow :rgb(201, 0, 2) 0px 0px, rgb(201, 0, 2) 0px 0px, rgb(220, 118, 117) 17px 23px 42px -5px, rgb(202, 2, 4) 0px 8px 10px -6px;">
-              <div class="row">
-                <div class="col-md-3">
-                <a data-link data-title="' . $name . '" data-artist="AudioPizza"
-                                    data-img="' . $image_url . '"
-                                    href="' . $music_url . '" class="single-item__cover">
-                                      <div class="store-item__image-wrapper">
-                                          <img src="' . $image_url . '" alt="">
-                                          <div class="overlay"></div>
-                                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                              <path d="M18.54,9,8.88,3.46a3.42,3.42,0,0,0-5.13,3V17.58A3.42,3.42,0,0,0,7.17,21a3.43,3.43,0,0,0,1.71-.46L18.54,15a3.42,3.42,0,0,0,0-5.92Zm-1,4.19L7.88,18.81a1.44,1.44,0,0,1-1.42,0,1.42,1.42,0,0,1-.71-1.23V6.42a1.42,1.42,0,0,1,.71-1.23A1.51,1.51,0,0,1,7.17,5a1.54,1.54,0,0,1,.71.19l9.66,5.58a1.42,1.42,0,0,1,0,2.46Z" />
-                                          </svg>
-                                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                              <path d="M16,2a3,3,0,0,0-3,3V19a3,3,0,0,0,6,0V5A3,3,0,0,0,16,2Zm1,17a1,1,0,0,1-2,0V5a1,1,0,0,1,2,0ZM8,2A3,3,0,0,0,5,5V19a3,3,0,0,0,6,0V5A3,3,0,0,0,8,2ZM9,19a1,1,0,0,1-2,0V5A1,1,0,0,1,9,5Z" />
-                                          </svg>
-                                      </div>
-                              </a>
-                </div>
-                <div class="col-md-6">
-                          <div class="article__content">
-                                      <h4 style="color: #C1252F;font-size: 40px;">' . $name . '</h4>
-                                      <p style="color: black">' . $description . '</p>
-                          </div>
-                          <div class="share_banner">
-                              <span style="cursor: pointer" class="whatsapp" id="whatsapp-share">
-                                      <ion-icon name="logo-whatsapp"></ion-icon>
-                              </span>
-                              <span style="cursor: pointer" class="facebook" id="facebook-share">
-                                      <ion-icon name="logo-facebook"></ion-icon>
-                              </span>
-                              <span style="cursor: pointer" class="twitter" id="twitter-share">
-                                      <i class="fa-brands fa-x-twitter"></i>
-                              </span>
-                          </div>
-                </div>
-                <div class="col-md-3">
-                   <div class="podcast-img">
-                       <img src="' . $image_url . '" alt="">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>';
-        }
-        ?>
-    </div>
-    </div>
-     
-</section>
-<main class="" style="margin-top:60px">
-  <div class="container">
-    <!-- Categories Section -->
-    <div class="category-section">
-      <!-- <h2>Categories</h2> -->
-      <div class="main__title" style="margin-bottom:20px;">
-            <h2>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path d="M21.65,2.24a1,1,0,0,0-.8-.23l-13,2A1,1,0,0,0,7,5V15.35A3.45,3.45,0,0,0,5.5,15,3.5,3.5,0,1,0,9,18.5V10.86L20,9.17v4.18A3.45,3.45,0,0,0,18.5,13,3.5,3.5,0,1,0,22,16.5V3A1,1,0,0,0,21.65,2.24ZM5.5,20A1.5,1.5,0,1,1,7,18.5,1.5,1.5,0,0,1,5.5,20Zm13-2A1.5,1.5,0,1,1,20,16.5,1.5,1.5,0,0,1,18.5,18ZM20,7.14,9,8.83v-3L20,4.17Z"/>
-                </svg>
-                <a href="#">Categories</a>
-            </h2>
-        </div>
-
-      <!-- Bootstrap Row for Categories -->
-      <div id="categoryCarousel" class="owl-carousel owl-theme">
-        <!-- Categories will be dynamically populated here -->
-      </div>
-    </div>
-  </div>
-</main>
-
-
-
-
-
-	<!-- main content -->
-	<main class="main">
-		<div class="container">
-    <section class="row row--grid">
-    <div class="col-12" style="margin-bottom: 30px;">
-        <div class="main__title">
-            <h2>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path d="M21.65,2.24a1,1,0,0,0-.8-.23l-13,2A1,1,0,0,0,7,5V15.35A3.45,3.45,0,0,0,5.5,15,3.5,3.5,0,1,0,9,18.5V10.86L20,9.17v4.18A3.45,3.45,0,0,0,18.5,13,3.5,3.5,0,1,0,22,16.5V3A1,1,0,0,0,21.65,2.24ZM5.5,20A1.5,1.5,0,1,1,7,18.5,1.5,1.5,0,0,1,5.5,20Zm13-2A1.5,1.5,0,1,1,20,16.5,1.5,1.5,0,0,1,18.5,18ZM20,7.14,9,8.83v-3L20,4.17Z"/>
-                </svg>
-                <a href="#">Top Podcasts</a>
-            </h2>
-        </div>
-    </div>
-
-    <?php
-    // Initialize cURL session
-    $curl = curl_init();
-
-    // Set cURL options
-    curl_setopt_array($curl, array(
-        CURLOPT_URL => 'http://pandit.33crores.com/api/podcasts',
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'GET',
-    ));
-
-    // Execute cURL request and get response
-    $response = curl_exec($curl);
-
-    // Check for cURL errors
-    if (curl_errno($curl)) {
-        echo 'cURL error: ' . curl_error($curl);
-        curl_close($curl);
-        exit;
+// Find the category matching the category_id
+$selectedCategory = null;
+foreach ($categories['data'] as $category) {
+    if ($category['id'] === $categoryId) {
+        $selectedCategory = $category;
+        break;
     }
+}
 
-    // Close cURL session
-    curl_close($curl);
+// Check if category details were found
+if ($selectedCategory === null) {
+    echo "Category not found.";
+    exit;
+}
 
-    // Decode JSON response
-    $podcasts = json_decode($response, true);
+// Extract category details
+$categoryImage = $selectedCategory['category_img'];
+$categoryName = $selectedCategory['category_name'];
+?>
 
-    // Check if decoding was successful and the response is an array
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        echo 'JSON decode error: ' . json_last_error_msg();
-    } elseif (!is_array($podcasts)) {
-        echo '<p>API response is not an array.</p>';
-    } else {
-        // Sort the podcasts array by a specific field in ascending order
-        if (isset($podcasts['data']) && is_array($podcasts['data'])) {
-            usort($podcasts['data'], function ($a, $b) {
-                return strtotime($a['created_at']) - strtotime($b['created_at']); // Adjust the field accordingly
-            });
-
-            // Display podcasts
-            foreach ($podcasts['data'] as $index => $podcast) {
-                // Ensure that each field is set and is a string
-                $name = isset($podcast['name']) ? htmlspecialchars($podcast['name']) : 'Unknown Name';
-                $description = isset($podcast['description']) ? htmlspecialchars($podcast['description']) : 'No Description';
-                $image_url = isset($podcast['image_url']) ? htmlspecialchars($podcast['image_url']) : 'default-image.png';
-                $music_url = isset($podcast['music_url']) ? htmlspecialchars($podcast['music_url']) : '#';
-
-                echo'
-   
-       <div class="col-md-6 col-xl-4">
-    <a data-link data-title="' . $name . '" data-artist="AudioPizza"
-       data-img="' . $image_url . '"
-       href="' . $music_url . '" class="single-item__cover" style="height: 245px !important">
-       <img src="' . $image_url . '" alt="' . $name . '">
-       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-           <path d="M18.54,9,8.88,3.46a3.42,3.42,0,0,0-5.13,3V17.58A3.42,3.42,0,0,0,7.17,21a3.43,3.43,0,0,0,1.71-.46L18.54,15a3.42,3.42,0,0,0,0-5.92Zm-1,4.19L7.88,18.81a1.44,1.44,0,0,1-1.42,0,1.42,1.42,0,0,1-.71-1.23V6.42a1.42,1.42,0,0,1,.71-1.23A1.51,1.51,0,0,1,7.17,5a1.54,1.54,0,0,1,.71.19l9.66,5.58a1.42,1.42,0,0,1,0,2.46Z"/>
-       </svg>
-       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-           <path d="M16,2a3,3,0,0,0-3,3V19a3,3,0,0,0,6,0V5A3,3,0,0,0,16,2Zm1,17a1,1,0,0,1-2,0V5a1,1,0,0,1,2,0ZM8,2A3,3,0,0,0,5,5V19a3,3,0,0,0,6,0V5A3,3,0,0,0,8,2ZM9,19a1,1,0,0,1-2,0V5A1,1,0,0,1,9,5Z"/>
-       </svg>
-    </a>
-    <li class="single-item">
-        <div class="single-item__title">
-            <h4 style="font-weight: bold;color: #C1252F;font-size: 18px">' . $name . '</h4>
-            <p style="font-size: 14px;">' . $description . '</p>
-        </div>
-        <div class="dropdown">
-            <button class="dropdown-button" onclick="toggleDropdown(' . $index . ')">  <i class="fa fa-share-alt"></i></button>
-            <div class="dropdown-content" id="dropdown-' . $index . '">
-                <a href="#" class="whatsapp" id="whatsapp-share"><ion-icon name="logo-whatsapp"></ion-icon> WhatsApp</a>
-                <a href="#" class="facebook"  id="facebook-share"><ion-icon name="logo-facebook"></ion-icon> Facebook</a>
-                <a href="#" class="twitter" id="twitter-share"><i class="fa-brands fa-x-twitter"></i> Twitter</a>
-            </div>
-        </div>
-    </li>
+<div class="category-banner" style="background-image: url('https://pandit.33crores.com/storage/<?php echo $categoryImage; ?>');">
+    <div class="overlay">
+        <h1 class="category-title"><?php echo htmlspecialchars($categoryName); ?></h1>
+    </div>
 </div>
 
-     ';
+<main class="main">
+    <div class="container">
+        <section class="row row--grid">
+            <!-- <div class="col-12" style="margin-bottom: 30px;">
+                <div class="main__title">
+                    <h2>Podcasts in Category ID: <?php echo $category_id; ?></h2>
+                </div>
+            </div> -->
+
+            <?php
+            if (!empty($filtered_podcasts)) {
+                foreach ($filtered_podcasts as $index => $podcast) {
+                    $name = htmlspecialchars($podcast['name'] ?? 'Unknown Name');
+                    $description = htmlspecialchars($podcast['description'] ?? 'No Description');
+                    $image_url = htmlspecialchars($podcast['image_url'] ?? 'default-image.png');
+                    $music_url = htmlspecialchars($podcast['music_url'] ?? '#');
+
+                    echo '
+                    <div class="col-md-6 col-xl-4">
+                        <a data-link data-title="' . $name . '" data-artist="AudioPizza"
+                           data-img="' . $image_url . '"
+                           href="' . $music_url . '" class="single-item__cover" style="height: 245px !important">
+                           <img src="' . $image_url . '" alt="' . $name . '">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M18.54,9,8.88,3.46a3.42,3.42,0,0,0-5.13,3V17.58A3.42,3.42,0,0,0,7.17,21a3.43,3.43,0,0,0,1.71-.46L18.54,15a3.42,3.42,0,0,0,0-5.92Zm-1,4.19L7.88,18.81a1.44,1.44,0,0,1-1.42,0,1.42,1.42,0,0,1-.71-1.23V6.42a1.42,1.42,0,0,1,.71-1.23A1.51,1.51,0,0,1,7.17,5a1.54,1.54,0,0,1,.71.19l9.66,5.58a1.42,1.42,0,0,1,0,2.46Z"/>
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M16,2a3,3,0,0,0-3,3V19a3,3,0,0,0,6,0V5A3,3,0,0,0,16,2Zm1,17a1,1,0,0,1-2,0V5a1,1,0,0,1,2,0ZM8,2A3,3,0,0,0,5,5V19a3,3,0,0,0,6,0V5A3,3,0,0,0,8,2ZM9,19a1,1,0,0,1-2,0V5A1,1,0,0,1,9,5Z"/>
+                            </svg>
+                        </a>
+                        <li class="single-item">
+                            <div class="single-item__title">
+                                <h4 style="font-weight: bold;color: #C1252F;font-size: 18px">' . $name . '</h4>
+                                <p style="font-size: 14px;">' . $description . '</p>
+                            </div>
+                             <div class="dropdown">
+                                <button class="dropdown-button" onclick="toggleDropdown(' . $index . ')">  <i class="fa fa-share-alt"></i></button>
+                                <div class="dropdown-content" id="dropdown-' . $index . '">
+                                    <a href="#" class="whatsapp" id="whatsapp-share"><ion-icon name="logo-whatsapp"></ion-icon> WhatsApp</a>
+                                    <a href="#" class="facebook"  id="facebook-share"><ion-icon name="logo-facebook"></ion-icon> Facebook</a>
+                                    <a href="#" class="twitter" id="twitter-share"><i class="fa-brands fa-x-twitter"></i> Twitter</a>
+                                </div>
+                            </div>
+                        </li>
+                    </div>
+                    ';
+                }
+            } else {
+                echo '<p>No podcasts available for this category.</p>';
             }
-        } else {
-            echo '<p>No podcasts available at the moment.</p>';
-        }
-    }
-    ?>
-</section>
-
-
-
-
-  </div>
-	</main>
-
-
+            ?>
+        </section>
+    </div>
+</main>
 	<!-- end main content -->
 
 	<!-- footer -->
@@ -674,7 +587,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Owl Carousel JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 
-<script src="js/myscript.js"></script>
+<!-- <script src="js/myscript.js"></script> -->
 
 	<script src="js/jquery-3.5.1.min.js"></script>
 	<script src="js/bootstrap.bundle.min.js"></script>
