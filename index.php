@@ -231,26 +231,66 @@
   Player
 </button>
 	<!-- end player -->
-<main class="" style="margin-bottom:50px">
+  <main class="" style="margin-bottom:50px">
   <div class="">
     <!-- Home Banner Section -->
     <div class="home-banner-section">
       <div id="homeBannerCarousel" class="owl-carousel owl-theme">
-        <!-- Banner Image Item -->
-        <div class="item">
-          <img src="https://poojastore.33crores.com/cdn/shop/files/3_6426324a-0668-4d7a-b907-cc51d2f0d0b1.png" alt="Home Banner" class="img-fluid d-block w-100">
-        </div>
-        <div class="item">
-          <img src="https://poojastore.33crores.com/cdn/shop/files/3_6426324a-0668-4d7a-b907-cc51d2f0d0b1.png" alt="Home Banner" class="img-fluid d-block w-100">
-        </div>
-        <div class="item">
-          <img src="https://poojastore.33crores.com/cdn/shop/files/3_6426324a-0668-4d7a-b907-cc51d2f0d0b1.png" alt="Home Banner" class="img-fluid d-block w-100">
-        </div>
-        <!-- You can add more images here by copying the above block -->
+        <?php
+        // Initialize cURL session
+        $curl = curl_init();
+
+        // Set cURL options for fetching banner data
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://pandit.33crores.com/api/app-banners',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+        ));
+
+        // Execute cURL request and get response
+        $response = curl_exec($curl);
+
+        // Check for cURL errors
+        if (curl_errno($curl)) {
+            echo 'cURL error: ' . curl_error($curl);
+            curl_close($curl);
+            exit;
+        }
+
+        // Close cURL session
+        curl_close($curl);
+
+        // Decode JSON response
+        $banners = json_decode($response, true);
+
+        // Check if decoding was successful and the response is an array
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            echo 'JSON decode error: ' . json_last_error_msg();
+        } elseif (!is_array($banners) || !isset($banners['data'])) {
+            echo '<p>API response is not in the expected format.</p>';
+        } else {
+            // Loop through banners and display those with category 'podcast'
+            foreach ($banners['data'] as $banner) {
+                if (isset($banner['category']) && $banner['category'] === 'podcast') {
+                    $image_url = isset($banner['banner_img']) ? htmlspecialchars($banner['banner_img']) : 'default-image.png';
+                    echo '
+                    <div class="item">
+                      <img src="' . $image_url . '" alt="Podcast Banner" class="img-fluid d-block w-100">
+                    </div>';
+                }
+            }
+        }
+        ?>
       </div>
     </div>
   </div>
 </main>
+
 
 <section class="row row--grid podcast-div-div">
   <div class="col-12 d-flex justify-content-center align-items-center" >
