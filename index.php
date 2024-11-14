@@ -277,7 +277,7 @@
             // Loop through banners and display those with category 'podcast'
             foreach ($banners['data'] as $banner) {
                 if (isset($banner['category']) && $banner['category'] === 'podcast') {
-                    $image_url = isset($banner['banner_img']) ? htmlspecialchars($banner['banner_img']) : 'default-image.png';
+                    $image_url = isset($banner['banner_img_url']) ? htmlspecialchars($banner['banner_img_url']) : 'default-image.png';
                     echo '
                     <div class="item">
                       <img src="' . $image_url . '" alt="Podcast Banner" class="img-fluid d-block w-100">
