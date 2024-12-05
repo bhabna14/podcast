@@ -342,10 +342,10 @@
             $latestPodcast = $podcasts['data'][0]; // Assuming there's at least one podcast
 
             // Ensure that each field is set and is a string
-            $name = isset($latestPodcast['name']) ? htmlspecialchars($latestPodcast['name']) : 'Unknown Name';
+            $name = isset($latestPodcast['podcast_prepair']['podcast_name']) ? htmlspecialchars($latestPodcast['podcast_prepair']['podcast_name']) : 'Unknown Name';
             $description = isset($latestPodcast['description']) ? htmlspecialchars($latestPodcast['description']) : 'No Description';
-            $image_url = isset($latestPodcast['image_url']) ? htmlspecialchars($latestPodcast['image_url']) : 'default-image.png';
-            $music_url = isset($latestPodcast['music_url']) ? htmlspecialchars($latestPodcast['music_url']) : '#';
+            $image_url = isset($latestPodcast['podcast_image']) ? htmlspecialchars($latestPodcast['podcast_image']) : 'default-image.png';
+            $music_url = isset($latestPodcast['podcast_music']) ? htmlspecialchars($latestPodcast['podcast_music']) : '#';
 
             // Display only the latest podcast
             echo '
@@ -487,10 +487,11 @@
             // Display podcasts
             foreach ($podcasts['data'] as $index => $podcast) {
                 // Ensure that each field is set and is a string
-                $name = isset($podcast['name']) ? htmlspecialchars($podcast['name']) : 'Unknown Name';
+                
+                $name = isset($podcast['podcast_prepair']['podcast_name']) ? htmlspecialchars($podcast['podcast_prepair']['podcast_name']) : 'Unknown Name';
                 $description = isset($podcast['description']) ? htmlspecialchars($podcast['description']) : 'No Description';
-                $image_url = isset($podcast['image_url']) ? htmlspecialchars($podcast['image_url']) : 'default-image.png';
-                $music_url = isset($podcast['music_url']) ? htmlspecialchars($podcast['music_url']) : '#';
+                $image_url = isset($podcast['podcast_image']) ? htmlspecialchars($podcast['podcast_image']) : 'default-image.png';
+                $music_url = isset($podcast['podcast_music']) ? htmlspecialchars($podcast['podcast_music']) : '#';
 
                 echo'
    
